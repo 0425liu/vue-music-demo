@@ -34,10 +34,13 @@
             <span class="dot"></span>
             <span class="dot"></span>
           </div>
-          <div class="progress-bar-wrapper">
-            <span class="time item-l"></span>
-            <div class="progress-bar-wrapper"></div>
-            <span class="time time-r"></span>
+          <div class="progress-wrapper">
+            <span class="time item-l">{{format(currentTime)}}</span>
+
+            <div class="progress-bar-wrapper">
+              <progress-bar></progress-bar>
+            </div>
+            <span class="time time-r">{{format(currentSong.duration)}}</span>
           </div>
           <div class="operators">
             <div class="icon i-left">
@@ -76,7 +79,7 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error"></audio>
+    <audio @ended="ended" @timeupdate="updateTime" ref="audio" :src="currentSong.url" @canplay="ready" @error="error"></audio>
   </div>
 </template>
 
@@ -84,11 +87,13 @@
 import { mapGetters, mapMutations } from "vuex";
 import animations from "create-keyframe-animation";
 import { prefixStyle } from "common/js/dom";
+import ProgressBar from "widget/progress/progress";
 const transform = prefixStyle("transform");
 export default {
   data() {
     return {
-      songReady: false
+      songReady: false,
+      currentTime: 0
     };
   },
   computed: {
@@ -153,6 +158,18 @@ export default {
     open() {
       this.setFullScreen(true);
     },
+    ended() {
+      this.next();
+    },
+    updateTime(e) {
+      this.currentTime = e.target.currentTime;
+    },
+    format(interval) {
+      interval = Math.floor(interval);
+      const minute = Math.floor(interval / 60);
+      let second = this._pad(interval % 60);
+      return `${minute}:${second}`;
+    },
     enter(el, done) {
       const { x, y, scale } = this._getPosAndScale();
       let animation = {
@@ -189,6 +206,14 @@ export default {
       this.$refs.cdWrapper.style.transition = "";
       this.$refs.cdWrapper.style[transform] = "";
     },
+    _pad(num, n = 2) {
+      let len = num.toString().length;
+      while (len < n) {
+        num = "0" + num;
+        len++;
+      }
+      return num;
+    },
     _getPosAndScale() {
       const tragetWidth = 40;
       const paddingLeft = 40;
@@ -224,7 +249,9 @@ export default {
       });
     }
   },
-  components: {}
+  components: {
+    ProgressBar
+  }
 };
 </script>
 
