@@ -1,6 +1,8 @@
 <template>
-  <div>
-    搜索
+  <div class="search">
+    <div class="search-box-wrapper">
+
+    </div>
   </div>
 </template>
 
