@@ -16,5 +16,11 @@ export default {
 </script>
 
 <style lang="scss" scoped >
-
+@import "~common/scss/variable";
+@import "~common/scss/mixin";
+.search {
+  .search-box-wrapper {
+    margin: 20px;
+  }
+}
 </style>
