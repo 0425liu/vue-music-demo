@@ -42,10 +42,10 @@ export default {
     },
     _normalizeSongs(list) {
       let ret = [];
-      list.forEach(item => {
+      list.forEach((item, index) => {
         let { musicData } = item;
         if (musicData.songid && musicData.albumid) {
-          ret.push(createSong(musicData));
+          ret.push(createSong(musicData, index));
         }
       });
       return ret;
