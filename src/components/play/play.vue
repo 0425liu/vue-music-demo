@@ -19,6 +19,9 @@
                 <img :src="currentSong.image" alt="" class="image">
               </div>
             </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
             <div class="lyric-wrapper">
@@ -77,11 +80,12 @@
             <i class="icon-mini" :class="playIconMini" @click.stop="togglePlay"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <playlist ref="playlist"></playlist>
     <audio @ended="ended" @timeupdate="updateTime" ref="audio" :src="currentSong.url" @canplay="ready" @error="error"></audio>
   </div>
 </template>
@@ -96,6 +100,7 @@ import { shuffle } from "common/js/util";
 import ProgressCircle from "widget/progress-circle/progress-circle";
 import Lyric from "lyric-parser";
 import Scroll from "widget/scroll/scroll";
+import Playlist from "components/playlist/playlist";
 const transform = prefixStyle("transform");
 const transitionDuration = prefixStyle("transitionDuration");
 export default {
@@ -106,7 +111,8 @@ export default {
       radius: 32,
       currentLineNum: 0,
       currentLyric: null,
-      currentShow: "CD"
+      currentShow: "CD",
+      playingLyric: ""
     };
   },
   created() {
@@ -144,6 +150,9 @@ export default {
     ])
   },
   methods: {
+    showPlaylist() {
+      this.$refs.playlist.show();
+    },
     middleTouchStart(e) {
       this.touch.initiate = true;
       //用来判断是否一次移动
@@ -370,14 +379,13 @@ export default {
         .getLyric()
         .then(lyricStr => {
           this.currentLyric = new Lyric(lyricStr, this.handleLyric);
-          console.log(this.currentLyric);
           if (this.playing) {
             this.currentLyric.play();
           }
         })
         .catch(() => {});
     },
-    handleLyric({ lineNum }) {
+    handleLyric({ lineNum, txt }) {
       this.currentLineNum = lineNum;
       if (lineNum > 5) {
         let lineEl = this.$refs.lyricLine[lineNum - 5];
@@ -385,6 +393,7 @@ export default {
       } else {
         this.$refs.lyricList.scrollTo(0, 0, 1000);
       }
+      this.playingLyric = txt;
     },
     ...mapMutations({
       setFullScreen: "SET_FULL_SCREEN",
@@ -396,6 +405,7 @@ export default {
   },
   watch: {
     currentSong(newValue, oldValue) {
+      if (!newValue.id) return;
       if (newValue.id === oldValue.id) return;
       if (this.currentLyric) {
         this.currentLyric.stop();
@@ -419,7 +429,8 @@ export default {
   components: {
     ProgressBar,
     ProgressCircle,
-    Scroll
+    Scroll,
+    Playlist
   }
 };
 </script>
