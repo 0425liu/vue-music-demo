@@ -1,7 +1,7 @@
 import * as types from './mutationTypes';
 import { playMode } from "common/js/config";
 import { shuffle } from 'common/js/util'
-import { saveSearch, deleteSearch, clearSearch } from "common/js/cache"
+import { deleteFavorite, saveSearch, deleteSearch, clearSearch, savePlay, saveFavorite } from "common/js/cache"
 
 function findIndex(list, song) {
     return list.findIndex((item) => {
@@ -37,7 +37,6 @@ export const insertSong = ({ commit, state }, song) => {
     let sequenceList = state.sequenceList.slice();
     let currentIndex = state.currentIndex;
     // 记录当前歌曲
-    alert(state.currentIndex)
     let currentSong = playlist[currentIndex];
     // 因为是插入歌曲，所以索引+1
     currentIndex++
@@ -112,4 +111,15 @@ export const deleteSongList = function({ commit }) {
     commit(types.SET_PLAYLIST, []);
     commit(types.SET_SEQUENCE_LIST, []);
     commit(types.SET_PLAYING_STATE, false);
+}
+
+export const savePlayHistory = function({ commit }, song) {
+    commit(types.SET_PLAY_HISTORY, savePlay(song))
+}
+export const saveFavoriteList = function({ commit }, song) {
+    commit(types.SET_FAVORITE_LIST, saveFavorite(song))
+}
+
+export const deleteFavoriteList = function({ commit }, song) {
+    commit(types.SET_FAVORITE_LIST, deleteFavorite(song))
 }

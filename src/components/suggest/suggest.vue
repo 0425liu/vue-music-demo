@@ -74,7 +74,7 @@ export default {
         console.log("suggest");
         this.insertSong(item);
       }
-      // this.$emit("select", item);
+      this.$emit("select", item);
     },
     searchMore() {
       if (!this.hasMore) return;
