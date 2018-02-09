@@ -208,15 +208,19 @@ export default {
       if (!this.songReady) {
         return;
       }
-      let index = this.currentIndex - 1;
-      if (index === -1) {
-        index = this.playlist.length - 1;
+      if (this.playlist.length === 1) {
+        this.loop();
+        return;
+      } else {
+        let index = this.currentIndex - 1;
+        if (index === -1) {
+          index = this.playlist.length - 1;
+        }
+        this.setCurrentIndex(index);
+        if (!this.playing) {
+          this.togglePlay();
+        }
       }
-      this.setCurrentIndex(index);
-      if (!this.playing) {
-        this.togglePlay();
-      }
-
       this.songReady = false;
     },
     percentChange(precent) {
@@ -235,6 +239,7 @@ export default {
       }
       if (this.playlist.length === 1) {
         this.loop();
+        return;
       } else {
         let index = this.currentIndex + 1;
         if (index === this.playlist.length) {
@@ -346,6 +351,9 @@ export default {
       this.currentSong
         .getLyric()
         .then(lyricStr => {
+          if (this.currentSong.lyric !== lyric) {
+            return;
+          }
           this.currentLyric = new Lyric(lyricStr, this.handleLyric);
           if (this.playing) {
             this.currentLyric.play();
